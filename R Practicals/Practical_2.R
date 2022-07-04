@@ -61,4 +61,34 @@ View(boys)
 
 #Find out the dimensions of the boys data set and inspect the first and final 6 cases in the data set.
 
-dim(boys)
+dimension = dim(boys)
+dimension
+
+#select the first 6 raws
+boys[1:6, ]
+
+
+#select the first 6 raws
+
+boys[743:748, ]
+
+#get the head of the dataset: ie the first 6 raws of the data
+
+head(boys)
+
+tail(boys)
+
+is.unsorted(boys$age)
+!is.unsorted(boys$age)
+
+#Select all boys that are older than 19, but younger than 19.5. How many are there?
+
+boys3A <- boys[boys$age > 19 & boys$age < 19.5, ]
+boys3B <- subset(boys, age > 19 & age < 19.5)
+
+#What is the mean age of boys younger than 15 years of age that do not live in region north?
+mean(boys$age[boys$age < 15 & boys$reg != "north" ], na.rm = TRUE)
+
+mean(subset(boys, age < 15 & reg != "north" )$age, na.rm = TRUE)
+
+
