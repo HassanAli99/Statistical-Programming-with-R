@@ -1,0 +1,171 @@
+---
+title: "Practical I"
+author: "Hassan Dahir"
+date: '2022-07-06'
+output: html_document
+---
+
+**Importing libraries**
+
+```{r}
+
+library(dplyr)
+library(magrittr)
+library(mice)
+library(ggplot2)
+
+```
+
+Fixing the see to make the work reproducible
+
+```{r cars}
+
+set.seed(123)
+
+```
+
+### 1. Create a scatterplot between age and bmi in the mice::boys data set
+
+```{r}
+boys %>% 
+  ggplot(aes(x=age, y=bmi)) +
+  geom_point(col= "green")
+```
+
+```{r}
+
+
+boys2 <-
+  
+  boys %>% 
+  mutate(class = cut(bmi, c(0, 18.5, 25, 30, Inf),
+                     labels = c("underweight",
+                               "healthy",
+                               "overweight",
+                               "obese")))
+```
+
+```{r}
+plot(bmi ~ age, subset = class == "underweight", col="light blue", data = boys2, ylim = c(10, 35), xlim = c(0, 25))
+plot(bmi ~ age, subset = class == "healthy", col="light green", data = boys2)
+plot(bmi ~ age, subset = class == "overweight", col="light blue", data = boys2)
+plot(bmi ~ age, subset = class == "obese", col="red", data = boys2)
+
+```
+
+```{r}
+
+boys2 %>% 
+  ggplot() +
+  geom_point(aes(age, bmi, col=class)) 
+
+```
+
+```{r}
+
+boys2 %>% 
+  filter(!is.na(class)) %>%
+  ggplot() +
+  geom_point(aes(age, bmi, col=class)) +
+  scale_color_manual(values = c("light blue", "light green", "orange", "red"))
+
+```
+
+# Create a histogram for age in the boys data set
+
+```{r}
+
+boys %$% 
+  hist(age, breaks = 50)
+```
+
+```{r}
+
+boys2 %>% 
+  ggplot() +
+  geom_histogram(aes(x=age), bins=50, col="blue") 
+
+```
+
+#Creating bar plot with the standard plot of R
+
+```{r}
+
+boys %$% 
+  table(reg) %>% 
+  barplot()
+
+```
+#Creating bar plot with the ggplot
+
+```{r}
+
+boys %>% 
+  ggplot() +
+  geom_bar(aes(reg), fill="dark blue")
+```
+
+
+#create a box plot for hgt
+
+```{r}
+
+boys %$% 
+
+  boxplot(hgt ~ reg)
+
+```
+
+
+
+
+```{r}
+boys %>%
+  ggplot(aes(reg, hgt)) +
+  geom_boxplot()
+
+```
+
+
+
+```{r}
+d1 <- boys %>%
+  subset(reg == "city") %$%
+  density(age)
+
+d2 <- boys %>%
+  subset(reg != "city") %$% 
+  density(age)
+
+plot(d1, col = "red", ylim = c(0, .08)) 
+lines(d2, col = "blue") 
+
+
+```
+
+```{r}
+boys %>%
+  
+  mutate(area = ifelse(reg == "city", "city", "rural")) %>%
+
+  
+  filter(!is.na(area)) %>%
+  ggplot(aes(age, fill = area)) +
+  geom_density(alpha = .3) # some transparency
+
+
+```
+
+```{r}
+boys %>%
+  mutate(Hgt = hgt - mean(hgt, na.rm = TRUE),
+         Age = cut(age, 0:22, labels = 0:21)) %>%
+  group_by(Age) %>%
+  summarize(Hgt = mean(Hgt, na.rm = TRUE)) %>% 
+  mutate(Diff = cut(Hgt, c(-Inf, 0, Inf),
+                    labels = c("Below Average", "Above Average"))) %>%
+  ggplot(aes(x = Age, y = Hgt, fill = Diff)) + 
+  geom_bar(stat = "identity") +
+  coord_flip()
+
+```
